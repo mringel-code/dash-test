@@ -14,14 +14,10 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 from langchain.vectorstores.chroma import Chroma
-from flask import Flask, render_template, request
 
 lc_embed_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-mpnet-base-v2"
 )
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
 
 endpoint_name = "jumpstart-dft-meta-textgeneration-llama-3-8b-instruct"
 predictor = retrieve_default(endpoint_name)
@@ -210,7 +206,3 @@ def upload_file():
 def uploaded_file(filename):
     # Your logic to get result here...
     return render_template('result.html', filename=filename)
-
-if __name__ == '__main__':
-    #app.run(debug=True)
-    main()
