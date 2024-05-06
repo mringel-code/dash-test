@@ -11,4 +11,3 @@ tiktoken
 PyPDF2 
 langdetect
 sqlalchemy
-test
