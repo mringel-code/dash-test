@@ -1,8 +1,10 @@
 from dash import Dash, dcc, html, dash_table, Input, Output, State, callback
+import application.py
 
 import base64
 import datetime
 import io
+import os
 
 import pandas as pd
 
@@ -38,6 +40,21 @@ def parse_contents(contents, filename, date):
 
     decoded = base64.b64decode(content_string)
     try:
+        with open(filename, "wb") as fp:   # Unpacks the uploaded files
+            fp.write(decoded)   
+        if 'pdf' in filename:  # Check if it is a pdf file
+            file_path = os.path.abspath(filename)
+            result = application.main(file_path)  # Process with another script
+            return html.Div([
+                html.H5(filename),
+                html.H6(datetime.datetime.fromtimestamp(date)),
+                html.P(str(result))
+            ])
+    except Exception as e:
+        print(e)
+        return html.Div(['There was an error processing this file.'])
+    '''
+    try:
         if 'csv' in filename:
             # Assume that the user uploaded a CSV file
             df = pd.read_csv(
@@ -69,6 +86,7 @@ def parse_contents(contents, filename, date):
             'wordBreak': 'break-all'
         })
     ])
+    '''
 
 @app.callback(Output('output-data-upload', 'children'),
               Input('upload-data', 'contents'),

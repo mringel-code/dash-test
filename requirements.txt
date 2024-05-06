@@ -1,2 +1,14 @@
 dash
 pandas
+yml
+langchain
+unstructured
+chromadb
+llama-index
+sentence-transformers
+sagemaker
+tiktoken  
+PyPDF2 
+langdetect
+sqlalchemy
+test
