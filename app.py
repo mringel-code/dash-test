@@ -8,7 +8,7 @@ import pandas as pd
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
     dcc.Upload(
@@ -70,7 +70,7 @@ def parse_contents(contents, filename, date):
         })
     ])
 
-@callback(Output('output-data-upload', 'children'),
+@app.callback(Output('output-data-upload', 'children'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'))
@@ -82,4 +82,4 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
         return children
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1',port=8050)
+    app.run_server(host='127.0.0.1',port=8050)
