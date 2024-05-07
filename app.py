@@ -7,8 +7,10 @@ import os
 
 import pandas as pd
 
+#new imports
 from sagemaker.predictor import retrieve_default
 endpoint_name = "jumpstart-dft-meta-textgeneration-llama-3-8b-instruct"
+from typing import Dict, List
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -48,7 +50,8 @@ def parse_contents(contents, filename, date):
         if 'pdf' in filename:  # Check if it is a pdf file
             file_path = os.path.abspath(filename)
             #result = application.main(file_path)  # Process with another script
-            result = file_path
+            summary = generate_summary("This is a dummy text. It doesnt say anything.")
+            result = summary
             
     except Exception as e:
         print(e)
@@ -104,6 +107,41 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
             parse_contents(c, n, d) for c, n, d in
             zip(list_of_contents, list_of_names, list_of_dates)]
         return children
+
+#Added code
+def format_messages(messages: List[Dict[str, str]]) -> List[str]:
+    """Format messages for Llama-3 chat models.
+    """
+    prompt: List[str] = []
+    prompt.extend(["<|begin_of_text|>"])
+
+    if messages[0]["role"] == "system":
+        content = "".join(["<|start_header_id|>system<|end_header_id|>\n\n", messages[0]["content"], "<|eot_id|>", "<|start_header_id|>user<|end_header_id|>\n\n", messages[1]["content"]])
+        messages = [{"role": messages[1]["role"], "content": content}] + messages[2:]
+
+    for user, assistant in zip(messages[::2], messages[1::2]):
+        prompt.extend(["<|start_header_id|>user<|end_header_id|>\n\n", (user["content"]).strip(), "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n", (assistant["content"]).strip()])
+
+    return "".join(prompt)
+
+def generate_summary(text):
+    dialog = [
+        {"role": "system", "content": "You are a business assistant for the insurance industry, skilled in summarizing complex requests for proposal (RfP) with highest precision."},
+        {"role": "user", "content": f"Summarize the following text:\n" + text},
+        {"role": "assistant", "content": ""}
+    ]
+    prompt = format_messages(dialog)
+    payload = {
+        "inputs": prompt,
+        "parameters": {
+            "max_new_tokens": 640,
+            "top_p": 0.9,
+            "temperature": 0.6,
+            "stop": "<|eot_id|>"
+        }
+    }
+    response = predictor.predict(payload)
+    return response["generated_text"]
 
 if __name__ == '__main__':
     app.run_server(host='0.0.0.0',port=8080)
