@@ -11,7 +11,7 @@ import pandas as pd
 from typing import Dict, List
 import boto3
 import json
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfReader
 from io import BytesIO
 
 client = boto3.session.Session().client('sagemaker-runtime')
