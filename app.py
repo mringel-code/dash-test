@@ -72,10 +72,10 @@ def parse_contents(contents, filename, date):
         CustomAttributes=custom_attributes, 
         ContentType=content_type,
         Accept=accept,
-        Body=payload
+        Body=str(payload)
     )
 
-    response = response['Body'].read().decode('utf-8')
+    summary = response['Body'].read().decode('utf-8')
     
     try:
         #with open(filename, "wb") as fp:   # Unpacks the uploaded files
