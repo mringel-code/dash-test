@@ -9,7 +9,6 @@ import pandas as pd
 
 from sagemaker.predictor import retrieve_default
 endpoint_name = "jumpstart-dft-meta-textgeneration-llama-3-8b-instruct"
-predictor = retrieve_default(endpoint_name)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -42,6 +41,7 @@ def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
+    predictor = retrieve_default(endpoint_name)
     try:
         #with open(filename, "wb") as fp:   # Unpacks the uploaded files
             #fp.write(decoded)   
