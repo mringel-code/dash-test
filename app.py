@@ -8,10 +8,13 @@ import os
 import pandas as pd
 
 #new imports
-endpoint_name = "jumpstart-dft-meta-textgeneration-llama-3-8b-instruct"
 from typing import Dict, List
 import boto3
 import json
+
+client = boto3.session.Session().client('sagemaker-runtime')
+endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
+content_type = 'application/json'  # The MIME type of the input data in the request body.
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -44,35 +47,7 @@ def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
-    
-    dialog = [
-        {"role": "system", "content": "You are a business assistant for the insurance industry, skilled in summarizing complex requests for proposal (RfP) with highest precision."},
-        {"role": "user", "content": f"Summarize the following text:\n This is a dummy text. It doesnt say anything."},
-        {"role": "assistant", "content": ""}
-    ]
-    prompt = format_messages(dialog)
-    payload_in = {
-        "inputs": prompt,
-        "parameters": {
-            "max_new_tokens": 640,
-            "top_p": 0.9,
-            "temperature": 0.6,
-            "stop": "<|eot_id|>"
-        }
-    }
-    
-    client = boto3.session.Session().client('sagemaker-runtime')
-    endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
-    content_type = 'application/json'  # The MIME type of the input data in the request body.
-    payload = json.dumps(payload_in) # Payload for inference.
-    response = client.invoke_endpoint(
-        EndpointName=endpoint_name, 
-        ContentType=content_type,
-        Body=payload
-    )
-
-    summary = response['Body'].read().decode('utf-8')
-    
+    summary = generate_summary("Sometimes our individual life can seem filled with chance, whether it is delayed train journeys, unexpected meetings, or cancelled plans.  At the same time, as consultants, for our clients we are battling uncertainty on a daily basis. We work hard to make their businesses more resilient towards the ever-changing market situation. So, how can we use such unpredictability to our benefit? Dr. Christian Busch, researcher with academic associations at LSE and NYU, has spent years examining ways to transform little uncertainties into small ways towards a more successful and satisfied life. In his research, he uncovers the secret behind the hidden force that rules the universe: serendipity.")
     try:
         #with open(filename, "wb") as fp:   # Unpacks the uploaded files
             #fp.write(decoded)   
@@ -126,7 +101,7 @@ def generate_summary(text):
         {"role": "assistant", "content": ""}
     ]
     prompt = format_messages(dialog)
-    payload = {
+    payload_in = {
         "inputs": prompt,
         "parameters": {
             "max_new_tokens": 640,
@@ -135,9 +110,14 @@ def generate_summary(text):
             "stop": "<|eot_id|>"
         }
     }
-    predictor = retrieve_default(endpoint_name)
-    response = predictor.predict(payload)
-    return response["generated_text"]
+    
+    payload = json.dumps(payload_in) # Payload for inference.
+    response = client.invoke_endpoint(
+        EndpointName=endpoint_name, 
+        ContentType=content_type,
+        Body=payload
+    )
+    return response['Body'].read().decode('utf-8')
 
 if __name__ == '__main__':
     app.run_server(host='0.0.0.0',port=8080)
