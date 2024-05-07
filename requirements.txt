@@ -1,6 +1,5 @@
 dash
 pandas
 chromadb
-sagemaker
 langchain
 boto3
