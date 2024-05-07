@@ -44,15 +44,18 @@ def parse_contents(contents, filename, date):
             fp.write(decoded)   
         if 'pdf' in filename:  # Check if it is a pdf file
             file_path = os.path.abspath(filename)
-            result = application.main(file_path)  # Process with another script
-            return html.Div([
+            #result = application.main(file_path)  # Process with another script
+            result = "this is a test"
+            
+    except Exception as e:
+        print(e)
+        return html.Div(['There was an error processing this file.'])
+    
+    return html.Div([
                 html.H5(filename),
                 html.H6(datetime.datetime.fromtimestamp(date)),
                 html.P(str(result))
             ])
-    except Exception as e:
-        print(e)
-        return html.Div(['There was an error processing this file.'])
     '''
     try:
         if 'csv' in filename:
