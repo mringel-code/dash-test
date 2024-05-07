@@ -23,7 +23,7 @@ endpoint_name = "jumpstart-dft-meta-textgeneration-llama-3-8b-instruct"
 predictor = retrieve_default(endpoint_name)
 
 CHROMA_PATH = "chroma"
-DATA_PATH = "data/pdfs/"
+#DATA_PATH = "data/pdfs/"
 
 def main(file_path):
     '''
@@ -182,27 +182,3 @@ def generate_response(context, question):
     }
     response = predictor.predict(payload)
     return response["generated_text"]
-
-# Flask routes
-@app.route('/', methods=['GET','POST'])
-def upload_file():
-    # Check if a POST request is made and it contains a file part.
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        if file.filename == '':
-            flash('No file selected')
-            return redirect(request.url)
-        if file:
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            # Your logic to call functions here...
-            return redirect(url_for('uploaded_file', filename=filename))
-    return render_template('upload.html')
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    # Your logic to get result here...
-    return render_template('result.html', filename=filename)
