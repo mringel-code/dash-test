@@ -64,7 +64,7 @@ def parse_contents(contents, filename, date):
     client = boto3.client('sagemaker-runtime')
     custom_attributes = "c000b4f9-df62-4c85-a0bf-7c525f9104a4"  # An example of a trace ID.
     endpoint_name = "jumpstart-dft-meta-textgeneration-llama-3-8b-instruct"# Your endpoint name.
-    content_type = "text/csv"  # The MIME type of the input data in the request body.
+    content_type = "application/json"  # The MIME type of the input data in the request body.
     accept = "Accept" # The desired MIME type of the inference in the response.
     payload = payload_in # Payload for inference.
     response = client.invoke_endpoint(
