@@ -39,6 +39,7 @@ def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
+    '''
     try:
         #with open(filename, "wb") as fp:   # Unpacks the uploaded files
             #fp.write(decoded)   
@@ -89,7 +90,6 @@ def parse_contents(contents, filename, date):
             'wordBreak': 'break-all'
         })
     ])
-    '''
 
 @app.callback(Output('output-data-upload', 'children'),
               Input('upload-data', 'contents'),
