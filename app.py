@@ -53,7 +53,7 @@ def parse_contents(contents, filename, date):
         #if 'pdf' in filename:  # Check if it is a pdf file
     #file_path = os.path.abspath(filename)
     text = ""
-    pdf = PdfReader(BytesIO(decoded))
+    reader = PdfReader(BytesIO(decoded))
     count = len(reader.pages)
     for i in range(count):
         page = reader.pages[i]
