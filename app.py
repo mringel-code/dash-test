@@ -40,12 +40,12 @@ def parse_contents(contents, filename, date):
 
     decoded = base64.b64decode(content_string)
     try:
-        with open(filename, "wb") as fp:   # Unpacks the uploaded files
-            fp.write(decoded)   
+        #with open(filename, "wb") as fp:   # Unpacks the uploaded files
+            #fp.write(decoded)   
         if 'pdf' in filename:  # Check if it is a pdf file
             file_path = os.path.abspath(filename)
             #result = application.main(file_path)  # Process with another script
-            result = "this is a test"
+            result = file_path
             
     except Exception as e:
         print(e)
