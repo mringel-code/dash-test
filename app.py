@@ -62,7 +62,7 @@ def parse_contents(contents, filename, date):
         return html.Div(['There was an error processing this file.'])
     
     return html.Div([
-                html.H5(filename),
+                html.H5(file_path),
                 html.H6(datetime.datetime.fromtimestamp(date)),
                 html.P(str(result))
             ])
@@ -79,6 +79,19 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
         return children
 
 #Added code
+def summarize_data(file_path):
+    # Path to the large pdf
+    large_text = extract_text_from_pdf(file_path)
+    # Split text into chunks
+    chunk_size = 3072
+    text_chunks = [large_text[i:i + chunk_size] for i in range(0, len(large_text), chunk_size)]
+    # Generate a summary for each chunk
+    summaries = [generate_summary(chunk) for chunk in text_chunks]
+    # Generate the final summary from the summaries of chunks
+    final_summary = generate_summary(" ".join(summaries))
+    log_results(final_summary)
+    print(final_summary)
+    
 def format_messages(messages: List[Dict[str, str]]) -> List[str]:
     """Format messages for Llama-3 chat models.
     """
