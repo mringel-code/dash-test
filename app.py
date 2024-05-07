@@ -51,7 +51,7 @@ def parse_contents(contents, filename, date):
     decoded = base64.b64decode(content_string)
     #try:
         #if 'pdf' in filename:  # Check if it is a pdf file
-    #file_path = os.path.abspath(filename)
+    file_path = os.path.abspath(filename)
     text = ""
     reader = PdfReader(BytesIO(decoded))
     count = len(reader.pages)
