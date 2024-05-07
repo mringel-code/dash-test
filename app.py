@@ -1,5 +1,4 @@
 from dash import Dash, dcc, html, dash_table, Input, Output, State, callback
-#import application
 
 import base64
 import datetime
@@ -7,6 +6,10 @@ import io
 import os
 
 import pandas as pd
+
+from sagemaker.predictor import retrieve_default
+endpoint_name = "jumpstart-dft-meta-textgeneration-llama-3-8b-instruct"
+predictor = retrieve_default(endpoint_name)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
