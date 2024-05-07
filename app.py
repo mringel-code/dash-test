@@ -47,15 +47,13 @@ def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
-    summary = generate_summary("Sometimes our individual life can seem filled with chance, whether it is delayed train journeys, unexpected meetings, or cancelled plans.  At the same time, as consultants, for our clients we are battling uncertainty on a daily basis. We work hard to make their businesses more resilient towards the ever-changing market situation. So, how can we use such unpredictability to our benefit? Dr. Christian Busch, researcher with academic associations at LSE and NYU, has spent years examining ways to transform little uncertainties into small ways towards a more successful and satisfied life. In his research, he uncovers the secret behind the hidden force that rules the universe: serendipity.")
+    #summary = generate_summary("Sometimes our individual life can seem filled with chance, whether it is delayed train journeys, unexpected meetings, or cancelled plans.  At the same time, as consultants, for our clients we are battling uncertainty on a daily basis. We work hard to make their businesses more resilient towards the ever-changing market situation. So, how can we use such unpredictability to our benefit? Dr. Christian Busch, researcher with academic associations at LSE and NYU, has spent years examining ways to transform little uncertainties into small ways towards a more successful and satisfied life. In his research, he uncovers the secret behind the hidden force that rules the universe: serendipity.")
     try:
         #with open(filename, "wb") as fp:   # Unpacks the uploaded files
             #fp.write(decoded)   
         if 'pdf' in filename:  # Check if it is a pdf file
             file_path = os.path.abspath(filename)
-            #result = application.main(file_path)  # Process with another script
-            #summary = generate_summary("This is a dummy text. It doesnt say anything.")
-            result = summary
+            result = summarize_data(file_path)
             
     except Exception as e:
         print(e)
@@ -89,8 +87,8 @@ def summarize_data(file_path):
     summaries = [generate_summary(chunk) for chunk in text_chunks]
     # Generate the final summary from the summaries of chunks
     final_summary = generate_summary(" ".join(summaries))
-    log_results(final_summary)
-    print(final_summary)
+    #log_results(final_summary)
+    return final_summary
     
 def format_messages(messages: List[Dict[str, str]]) -> List[str]:
     """Format messages for Llama-3 chat models.
