@@ -43,13 +43,32 @@ def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
+    
+    dialog = [
+        {"role": "system", "content": "You are a business assistant for the insurance industry, skilled in summarizing complex requests for proposal (RfP) with highest precision."},
+        {"role": "user", "content": f"Summarize the following text:\n This is a dummy text. It doesnt say anything."},
+        {"role": "assistant", "content": ""}
+    ]
+    prompt = format_messages(dialog)
+    payload = {
+        "inputs": prompt,
+        "parameters": {
+            "max_new_tokens": 640,
+            "top_p": 0.9,
+            "temperature": 0.6,
+            "stop": "<|eot_id|>"
+        }
+    }
+    predictor = retrieve_default(endpoint_name)
+    response = predictor.predict(payload)
+    
     try:
         #with open(filename, "wb") as fp:   # Unpacks the uploaded files
             #fp.write(decoded)   
         if 'pdf' in filename:  # Check if it is a pdf file
             file_path = os.path.abspath(filename)
             #result = application.main(file_path)  # Process with another script
-            summary = generate_summary("This is a dummy text. It doesnt say anything.")
+            #summary = generate_summary("This is a dummy text. It doesnt say anything.")
             result = summary
             
     except Exception as e:
