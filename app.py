@@ -11,7 +11,8 @@ import pandas as pd
 from typing import Dict, List
 import boto3
 import json
-from PyPDF2 import PdfReader
+from PyPDF2 import PdfFileReader
+from io import BytesIO
 
 client = boto3.session.Session().client('sagemaker-runtime')
 endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
@@ -50,8 +51,14 @@ def parse_contents(contents, filename, date):
     decoded = base64.b64decode(content_string)
     #try:
         #if 'pdf' in filename:  # Check if it is a pdf file
-    file_path = os.path.abspath(filename)
-    result = summarize_data(file_path)
+    #file_path = os.path.abspath(filename)
+    text = ""
+    pdf = PdfFileReader(BytesIO(decoded))
+    count = len(reader.pages)
+    for i in range(count):
+        page = reader.pages[i]
+        text += page.extract_text()
+    result = summarize_data(text)
             
     #except Exception as e:
         #print(e)
@@ -76,28 +83,16 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
 
 #Added code
 # Function to summarize the text of a pdf in a given file path
-def summarize_data(file_path):
-    # Path to the large pdf
-    large_text = extract_text_from_pdf(file_path)
+def summarize_data(text):
     # Split text into chunks
     chunk_size = 3072
-    text_chunks = [large_text[i:i + chunk_size] for i in range(0, len(large_text), chunk_size)]
+    text_chunks = [text[i:i + chunk_size] for i in range(0, len(text), chunk_size)]
     # Generate a summary for each chunk
     summaries = [generate_summary(chunk) for chunk in text_chunks]
     # Generate the final summary from the summaries of chunks
     final_summary = generate_summary(" ".join(summaries))
     #log_results(final_summary)
     return final_summary
-
-# Function to extract text from pdf
-def extract_text_from_pdf(pdf_path):
-    text = ""
-    reader = PdfReader(pdf_path)
-    count = len(reader.pages)
-    for i in range(count):
-        page = reader.pages[i]
-        text += page.extract_text()
-    return text
     
 def format_messages(messages: List[Dict[str, str]]) -> List[str]:
     """Format messages for Llama-3 chat models.
