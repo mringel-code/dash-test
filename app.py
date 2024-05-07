@@ -11,6 +11,7 @@ import pandas as pd
 from typing import Dict, List
 import boto3
 import json
+from PyPDF2 import PdfReader
 
 client = boto3.session.Session().client('sagemaker-runtime')
 endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
@@ -77,6 +78,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
         return children
 
 #Added code
+# Function to summarize the text of a pdf in a given file path
 def summarize_data(file_path):
     # Path to the large pdf
     large_text = extract_text_from_pdf(file_path)
@@ -89,6 +91,16 @@ def summarize_data(file_path):
     final_summary = generate_summary(" ".join(summaries))
     #log_results(final_summary)
     return final_summary
+
+# Function to extract text from pdf
+def extract_text_from_pdf(pdf_path):
+    text = ""
+    reader = PdfReader(pdf_path)
+    count = len(reader.pages)
+    for i in range(count):
+        page = reader.pages[i]
+        text += page.extract_text()
+    return text
     
 def format_messages(messages: List[Dict[str, str]]) -> List[str]:
     """Format messages for Llama-3 chat models.

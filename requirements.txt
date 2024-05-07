@@ -3,3 +3,4 @@ pandas
 chromadb
 langchain
 boto3
+PyPDF2
