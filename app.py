@@ -134,5 +134,53 @@ def generate_summary(text):
     )
     return response['Body'].read().decode('utf-8')
 
+def create_database():
+    documents = load_documents()
+    chunks = split_text(documents)
+    save_to_chroma(chunks)
+
+def load_documents():
+    loader = PyPDFLoader(os.environ.get("FILE_PATH"))
+    documents = loader.load_and_split()
+    return documents
+
+def split_text(documents: list[Document]):
+    chunks = documents
+    print(f"Split document into {len(chunks)} chunks.")
+
+    return chunks
+
+def save_to_chroma(chunks: list[Document]):
+    # Clear out the database first.
+    if os.path.exists(CHROMA_PATH):
+        shutil.rmtree(CHROMA_PATH)
+
+    collection_metadata = {"hnsw:space": "cosine"} # Define the metadata to change the distance function to cosine
+    
+    # Create a new DB from the documents.
+    db = Chroma.from_documents(
+        chunks, lc_embed_model, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
+    )
+    db.persist()
+    print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
+
+def query_data(query_text):
+    # Prepare the DB.
+    embedding_function = lc_embed_model
+    db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
+
+    # Search the DB.
+    results = db.similarity_search_with_relevance_scores(query_text, k=3)
+    if len(results) == 0 or results[0][1] < 0.1: # original: < 0.7
+        print(f"Unable to find matching results.")
+        return
+
+    context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
+
+    response_text = generate_response(context=context_text, question=query_text)
+    sources = [doc.metadata.get("source", None) for doc, _score in results]
+    formatted_response = f"Response: {response_text}"
+    print(formatted_response)
+
 if __name__ == '__main__':
     app.run_server(host='0.0.0.0',port=8080)
