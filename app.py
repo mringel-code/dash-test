@@ -73,9 +73,9 @@ def parse_contents(contents, filename, date):
     
     loader = PyPDFLoader(BytesIO(decoded))
     chunks = loader.load_and_split()
-    print(f"Split document into {len(chunks)} chunks.")
-    #save_to_chroma(chunks)
-    #query_result = query_data("What is the deadline for the RfP?")
+    #print(f"Split document into {len(chunks)} chunks.")
+    save_to_chroma(chunks)
+    query_result = query_data("What is the deadline for the RfP?")
                 
     #except Exception as e:
         #print(e)
@@ -186,7 +186,7 @@ def query_data(query_text):
     
 def generate_response(context, text):
     dialog = [
-        {"role": "system", "content": "You are a business assistant for the insurance industry, skilled in answering questions for a given request for proposal (RfP) with highest precision. Answer the question based only on the following context:\n\n" + context"},
+        {"role": "system", "content": "You are a business assistant for the insurance industry, skilled in answering questions for a given request for proposal (RfP) with highest precision. Answer the question based only on the following context:\n\n" + context},
         {"role": "user", "content": f"Answer the question based on the above context:\n" + text},
         {"role": "assistant", "content": ""}
     ]
