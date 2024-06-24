@@ -74,8 +74,8 @@ def parse_contents(contents, filename, date):
     loader = PyPDFLoader(BytesIO(decoded))
     chunks = loader.load_and_split()
     print(f"Split document into {len(chunks)} chunks.")
-    save_to_chroma(chunks)
-    query_result = query_data("What is the deadline for the RfP?")
+    #save_to_chroma(chunks)
+    #query_result = query_data("What is the deadline for the RfP?")
                 
     #except Exception as e:
         #print(e)
