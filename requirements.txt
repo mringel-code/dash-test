@@ -3,6 +3,7 @@ pandas
 chromadb
 langchain
 langchain_community
+langchain-huggingface
 boto3
 PyPDF2
 sentence-transformers
