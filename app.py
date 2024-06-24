@@ -14,9 +14,20 @@ import json
 from PyPDF2 import PdfReader
 from io import BytesIO
 
+from langchain.vectorstores.chroma import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.schema import Document
+from langchain.vectorstores.chroma import Chroma
+
 client = boto3.session.Session().client('sagemaker-runtime')
 endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
 content_type = 'application/json'  # The MIME type of the input data in the request body.
+
+lc_embed_model = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-mpnet-base-v2"
+)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -58,8 +69,14 @@ def parse_contents(contents, filename, date):
     for i in range(count):
         page = reader.pages[i]
         text += page.extract_text()
-    result = summarize_data(text)
-            
+    summary_result = summarize_data(text)
+    
+    loader = PyPDFLoader(BytesIO(decoded))
+    chunks = loader.load_and_split()
+    print(f"Split document into {len(chunks)} chunks.")
+    save_to_chroma(chunks)
+    query_result = query_data("What is the deadline for the RfP?")
+                
     #except Exception as e:
         #print(e)
         #return html.Div(['There was an error processing this file.'])
@@ -67,7 +84,8 @@ def parse_contents(contents, filename, date):
     return html.Div([
                 html.H5(file_path),
                 html.H6(datetime.datetime.fromtimestamp(date)),
-                html.P(str(result))
+                html.P(str(summary_result)),
+                html.P(str(query_result))
             ])
 
 @app.callback(Output('output-data-upload', 'children'),
@@ -111,7 +129,7 @@ def format_messages(messages: List[Dict[str, str]]) -> List[str]:
 
 def generate_summary(text):
     dialog = [
-        {"role": "system", "content": "You are a business assistant for the insurance industry, skilled in summarizing complex requests for proposal (RfP) with highest precision."},
+        {"role": "system", "content": f"You are a business assistant for the insurance industry, skilled in summarizing a given request for proposal (RfP) with highest precision."},
         {"role": "user", "content": f"Summarize the following text:\n" + text},
         {"role": "assistant", "content": ""}
     ]
@@ -133,22 +151,6 @@ def generate_summary(text):
         Body=payload
     )
     return response['Body'].read().decode('utf-8')
-
-def create_database():
-    documents = load_documents()
-    chunks = split_text(documents)
-    save_to_chroma(chunks)
-
-def load_documents():
-    loader = PyPDFLoader(os.environ.get("FILE_PATH"))
-    documents = loader.load_and_split()
-    return documents
-
-def split_text(documents: list[Document]):
-    chunks = documents
-    print(f"Split document into {len(chunks)} chunks.")
-
-    return chunks
 
 def save_to_chroma(chunks: list[Document]):
     # Clear out the database first.
@@ -178,9 +180,34 @@ def query_data(query_text):
     context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
 
     response_text = generate_response(context=context_text, question=query_text)
-    sources = [doc.metadata.get("source", None) for doc, _score in results]
-    formatted_response = f"Response: {response_text}"
-    print(formatted_response)
+    #sources = [doc.metadata.get("source", None) for doc, _score in results]
+    #formatted_response = f"Response: {response_text}"
+    return response_text
+    
+def generate_response(context, text):
+    dialog = [
+        {"role": "system", "content": "You are a business assistant for the insurance industry, skilled in answering questions for a given request for proposal (RfP) with highest precision. Answer the question based only on the following context:\n\n" + context"},
+        {"role": "user", "content": f"Answer the question based on the above context:\n" + text},
+        {"role": "assistant", "content": ""}
+    ]
+    prompt = format_messages(dialog)
+    payload_in = {
+        "inputs": prompt,
+        "parameters": {
+            "max_new_tokens": 640,
+            "top_p": 0.9,
+            "temperature": 0.6,
+            "stop": "<|eot_id|>"
+        }
+    }
+    
+    payload = json.dumps(payload_in) # Payload for inference.
+    response = client.invoke_endpoint(
+        EndpointName=endpoint_name, 
+        ContentType=content_type,
+        Body=payload
+    )
+    return response['Body'].read().decode('utf-8')
 
 if __name__ == '__main__':
     app.run_server(host='0.0.0.0',port=8080)

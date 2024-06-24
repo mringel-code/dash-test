@@ -2,5 +2,6 @@ dash
 pandas
 chromadb
 langchain
+langchain_community
 boto3
 PyPDF2
