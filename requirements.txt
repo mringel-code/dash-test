@@ -5,3 +5,4 @@ langchain
 langchain_community
 boto3
 PyPDF2
+sentence-transformers
