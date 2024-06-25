@@ -4,4 +4,4 @@ boto3
 PyPDF2
 langchain
 langchain_community
-sentence-transformers
+llama-index

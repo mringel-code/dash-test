@@ -18,18 +18,23 @@ from io import BytesIO
 #RAG imports
 from langchain_community.vectorstores import Chroma
 #from langchain_community.embeddings import GPT4AllEmbeddings
-from langchain_community.embeddings import HuggingFaceEmbeddings
+#from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 #from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
+from llama_index.embeddings.sagemaker_endpoint import SageMakerEmbedding
 
 client = boto3.session.Session().client('sagemaker-runtime')
 endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
 content_type = 'application/json'  # The MIME type of the input data in the request body.
 
-lc_embed_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-mpnet-base-v2"
+embedding_model = SageMakerEmbedding(
+  endpoint_name=endpoint_name
 )
+
+#lc_embed_model = HuggingFaceEmbeddings(
+#    model_name="sentence-transformers/all-mpnet-base-v2"
+#)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -78,8 +83,10 @@ def parse_contents(contents, filename, date):
     #loader = PyPDFLoader(BytesIO(decoded))
     #chunks = loader.load_and_split()
     chunks = reader.pages
+    embedding = embedding_model.get_text_embedding("An Amazon SageMaker endpoint is a fully managed resource that enables the deployment of machine learning models, specifically LLM (Large Language Models), for making predictions on new data.")
+    print(embedding)
     #print(f"Split document into {len(chunks)} chunks.")
-    save_to_chroma(chunks)
+    #save_to_chroma(chunks)
     #query_result = query_data("What is the deadline for the RfP?")
                 
     #except Exception as e:
@@ -157,7 +164,7 @@ def generate_summary(text):
     )
     return response['Body'].read().decode('utf-8')
 
-
+"""
 def save_to_chroma(chunks: List[Document]):
     # Clear out the database first.
     if os.path.exists(CHROMA_PATH):
@@ -172,7 +179,7 @@ def save_to_chroma(chunks: List[Document]):
     db.persist()
     #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
 
-"""
+
 def query_data(query_text):
     # Prepare the DB.
     embedding_function = lc_embed_model
