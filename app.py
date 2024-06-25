@@ -32,6 +32,8 @@ content_type = 'application/json'  # The MIME type of the input data in the requ
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
+CHROMA_PATH = "chroma"
+
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
