@@ -3,4 +3,3 @@ pandas
 boto3
 PyPDF2
 langchain_community
-langchain-huggingface
