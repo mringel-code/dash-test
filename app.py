@@ -27,9 +27,9 @@ client = boto3.session.Session().client('sagemaker-runtime')
 endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
 content_type = 'application/json'  # The MIME type of the input data in the request body.
 
-#lc_embed_model = HuggingFaceEmbeddings(
-#    model_name="sentence-transformers/all-mpnet-base-v2"
-#)
+lc_embed_model = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-mpnet-base-v2"
+)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -167,7 +167,7 @@ def save_to_chroma(chunks: List[Document]):
     
     # Create a new DB from the documents.
     db = Chroma.from_documents(
-        chunks, GPT4AllEmbeddings(), persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
+        chunks, lc_embed_model, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
     )
     db.persist()
     #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
