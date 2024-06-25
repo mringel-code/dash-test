@@ -4,4 +4,3 @@ boto3
 PyPDF2
 langchain
 langchain_community
-gpt4all
