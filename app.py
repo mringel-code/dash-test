@@ -154,7 +154,7 @@ def generate_summary(text):
     return response['Body'].read().decode('utf-8')
 
 
-def save_to_chroma(chunks: list[Document]):
+def save_to_chroma(chunks: List[Document]):
     # Clear out the database first.
     if os.path.exists(CHROMA_PATH):
         shutil.rmtree(CHROMA_PATH)
