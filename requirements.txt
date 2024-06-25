@@ -2,4 +2,5 @@ dash
 pandas
 boto3
 PyPDF2
+langchain
 langchain_community

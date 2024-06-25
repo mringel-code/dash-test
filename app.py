@@ -20,7 +20,7 @@ from langchain_community.embeddings import GPT4AllEmbeddings
 #from langchain-huggingface import HuggingFaceEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 #from langchain.text_splitter import RecursiveCharacterTextSplitter
-#from langchain.schema import Document
+from langchain.schema import Document
 
 client = boto3.session.Session().client('sagemaker-runtime')
 endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
@@ -72,10 +72,10 @@ def parse_contents(contents, filename, date):
         text += page.extract_text()
     summary_result = summarize_data(text)
     
-    loader = PyPDFLoader(BytesIO(decoded))
-    chunks = loader.load_and_split()
+    #loader = PyPDFLoader(BytesIO(decoded))
+    #chunks = loader.load_and_split()
     #print(f"Split document into {len(chunks)} chunks.")
-    save_to_chroma(chunks)
+    #save_to_chroma(chunks)
     #query_result = query_data("What is the deadline for the RfP?")
                 
     #except Exception as e:
@@ -153,7 +153,7 @@ def generate_summary(text):
     )
     return response['Body'].read().decode('utf-8')
 
-
+"""
 def save_to_chroma(chunks: list[Document]):
     # Clear out the database first.
     if os.path.exists(CHROMA_PATH):
@@ -163,11 +163,11 @@ def save_to_chroma(chunks: list[Document]):
     
     # Create a new DB from the documents.
     db = Chroma.from_documents(
-        chunks, lc_embed_model, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
+        chunks, GPT4AllEmbeddings(), persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
     )
     db.persist()
     #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
-"""
+
 def query_data(query_text):
     # Prepare the DB.
     embedding_function = lc_embed_model
