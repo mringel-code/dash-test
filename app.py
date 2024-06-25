@@ -152,6 +152,7 @@ def generate_summary(text):
     )
     return response['Body'].read().decode('utf-8')
 
+"""
 def save_to_chroma(chunks: list[Document]):
     # Clear out the database first.
     if os.path.exists(CHROMA_PATH):
@@ -208,6 +209,7 @@ def generate_response(context, text):
         Body=payload
     )
     return response['Body'].read().decode('utf-8')
+"""
 
 if __name__ == '__main__':
     app.run_server(host='0.0.0.0',port=8080)
