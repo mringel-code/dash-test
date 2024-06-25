@@ -72,10 +72,10 @@ def parse_contents(contents, filename, date):
         text += page.extract_text()
     summary_result = summarize_data(text)
     
-    #loader = PyPDFLoader(BytesIO(decoded))
-    #chunks = loader.load_and_split()
+    loader = PyPDFLoader(BytesIO(decoded))
+    chunks = loader.load_and_split()
     #print(f"Split document into {len(chunks)} chunks.")
-    #save_to_chroma(chunks)
+    save_to_chroma(chunks)
     #query_result = query_data("What is the deadline for the RfP?")
                 
     #except Exception as e:
@@ -153,7 +153,7 @@ def generate_summary(text):
     )
     return response['Body'].read().decode('utf-8')
 
-"""
+
 def save_to_chroma(chunks: list[Document]):
     # Clear out the database first.
     if os.path.exists(CHROMA_PATH):
@@ -168,6 +168,7 @@ def save_to_chroma(chunks: list[Document]):
     db.persist()
     #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
 
+"""
 def query_data(query_text):
     # Prepare the DB.
     embedding_function = lc_embed_model
@@ -185,7 +186,7 @@ def query_data(query_text):
     #sources = [doc.metadata.get("source", None) for doc, _score in results]
     #formatted_response = f"Response: {response_text}"
     return response_text
-    
+  
 def generate_response(context, text):
     dialog = [
         {"role": "system", "content": "You are a business assistant for the insurance industry, skilled in answering questions for a given request for proposal (RfP) with highest precision. Answer the question based only on the following context:\n\n" + context},
