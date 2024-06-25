@@ -24,9 +24,9 @@ client = boto3.session.Session().client('sagemaker-runtime')
 endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
 content_type = 'application/json'  # The MIME type of the input data in the request body.
 
-lc_embed_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-mpnet-base-v2"
-)
+#lc_embed_model = HuggingFaceEmbeddings(
+#    model_name="sentence-transformers/all-mpnet-base-v2"
+#)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -70,11 +70,11 @@ def parse_contents(contents, filename, date):
         text += page.extract_text()
     summary_result = summarize_data(text)
     
-    loader = PyPDFLoader(BytesIO(decoded))
-    chunks = loader.load_and_split()
+    #loader = PyPDFLoader(BytesIO(decoded))
+    #chunks = loader.load_and_split()
     #print(f"Split document into {len(chunks)} chunks.")
-    save_to_chroma(chunks)
-    query_result = query_data("What is the deadline for the RfP?")
+    #save_to_chroma(chunks)
+    #query_result = query_data("What is the deadline for the RfP?")
                 
     #except Exception as e:
         #print(e)
