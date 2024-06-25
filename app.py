@@ -14,11 +14,12 @@ import json
 from PyPDF2 import PdfReader
 from io import BytesIO
 
-from langchain_community.vectorstores import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.schema import Document
+#RAG imports
+#from langchain_community.vectorstores import Chroma
+#from langchain_huggingface import HuggingFaceEmbeddings
+#from langchain_community.document_loaders import PyPDFLoader
+#from langchain.text_splitter import RecursiveCharacterTextSplitter
+#from langchain.schema import Document
 
 client = boto3.session.Session().client('sagemaker-runtime')
 endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
@@ -83,8 +84,8 @@ def parse_contents(contents, filename, date):
     return html.Div([
                 html.H5(file_path),
                 html.H6(datetime.datetime.fromtimestamp(date)),
-                html.P(str(summary_result)),
-                html.P(str(query_result))
+                html.P(str(summary_result))
+                #html.P(str(query_result))
             ])
 
 @app.callback(Output('output-data-upload', 'children'),
