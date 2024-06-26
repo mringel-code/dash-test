@@ -98,7 +98,7 @@ def parse_contents(contents, filename, date):
     
     text = "Hi! It's time for the beach"
     text_embedding = embeddings.embed_query(text)
-    summary_result = summary_result + text_embedding
+    summary_result = summary_result + str(text_embedding[:5])
     
     #loader = PyPDFLoader(BytesIO(decoded))
     #chunks = loader.load_and_split()
