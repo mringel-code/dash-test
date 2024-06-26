@@ -2,7 +2,10 @@ dash
 pandas
 boto3
 PyPDF2
-langchain
 langchain_community
-llama-index-embeddings-sagemaker-endpoint
-llama-index
+langchain==0.1.0
+llama_index
+pypdf
+sagemaker --quiet --upgrade --force-reinstall
+llama-index-embeddings-langchain
+llama-index-llms-langchain
