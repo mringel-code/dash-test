@@ -31,7 +31,6 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 CHROMA_PATH = "chroma"
 
 import langchain
-import llama_index
 from langchain.embeddings import SagemakerEndpointEmbeddings
 from langchain.embeddings.sagemaker_endpoint import EmbeddingsContentHandler
 
