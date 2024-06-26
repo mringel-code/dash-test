@@ -89,11 +89,14 @@ def parse_contents(contents, filename, date):
         #if 'pdf' in filename:  # Check if it is a pdf file
     file_path = os.path.abspath(filename)
     text = ""
+    chunks = []
     reader = PdfReader(BytesIO(decoded))
     count = len(reader.pages)
     for i in range(count):
         page = reader.pages[i]
-        text += page.extract_text()
+        pagetext = page.extract_text()
+        text += pagetext
+        chunks.append(pagetext)
     summary_result = summarize_data(text)
     
     text = "Hi! It's time for the beach"
@@ -103,7 +106,7 @@ def parse_contents(contents, filename, date):
     #loader = PyPDFLoader(BytesIO(decoded))
     #chunks = loader.load_and_split()
     chunks = reader.pages
-    save_to_chroma(chunks)
+    save_to_chroma_text(chunks)
     #query_result = query_data("What is the deadline for the RfP?")
                 
     #except Exception as e:
@@ -181,7 +184,20 @@ def generate_summary(text):
     )
     return response['Body'].read().decode('utf-8')
 
+def save_to_chroma_text(chunks: List[string]):
+    # Clear out the database first.
+    if os.path.exists(CHROMA_PATH):
+        shutil.rmtree(CHROMA_PATH)
 
+    collection_metadata = {"hnsw:space": "cosine"} # Define the metadata to change the distance function to cosine
+    
+    # Create a new DB from the documents.
+    db = Chroma.from_texts(
+        chunks, embeddings, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
+    )
+    db.persist()
+    #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
+"""
 def save_to_chroma(chunks: List[Document]):
     # Clear out the database first.
     if os.path.exists(CHROMA_PATH):
@@ -196,7 +212,6 @@ def save_to_chroma(chunks: List[Document]):
     db.persist()
     #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
 
-"""
 def query_data(query_text):
     # Prepare the DB.
     embedding_function = lc_embed_model
