@@ -103,7 +103,7 @@ def parse_contents(contents, filename, date):
     text_embedding = embeddings.embed_query(text)
     summary_result = summary_result + str(text_embedding[:5])
     
-    loader = PyPDFLoader(BytesIO(decoded))
+    loader = PyPDFLoader(file_path)
     chunks = loader.load_and_split()
     #chunks = Document(reader.pages)
     save_to_chroma(chunks)
