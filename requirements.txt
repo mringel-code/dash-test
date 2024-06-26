@@ -4,8 +4,3 @@ boto3
 PyPDF2
 langchain_community
 langchain
-llama_index
-pypdf
-sagemaker
-llama-index-embeddings-langchain
-llama-index-llms-langchain

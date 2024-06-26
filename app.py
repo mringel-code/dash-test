@@ -22,7 +22,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import PyPDFLoader
 #from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
-from llama_index.embeddings.sagemaker_endpoint import SageMakerEmbedding
+#from llama_index.embeddings.sagemaker_endpoint import SageMakerEmbedding
 
 client = boto3.session.Session().client('sagemaker-runtime')
 endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
