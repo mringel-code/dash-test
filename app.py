@@ -17,20 +17,45 @@ from io import BytesIO
 
 #RAG imports
 from langchain_community.vectorstores import Chroma
-#from langchain_community.embeddings import GPT4AllEmbeddings
-#from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 #from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
-#from llama_index.embeddings.sagemaker_endpoint import SageMakerEmbedding
 
 client = boto3.session.Session().client('sagemaker-runtime')
+
 endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
 content_type = 'application/json'  # The MIME type of the input data in the request body.
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 CHROMA_PATH = "chroma"
+
+import langchain
+import llama_index
+from langchain.embeddings import SagemakerEndpointEmbeddings
+from langchain.embeddings.sagemaker_endpoint import EmbeddingsContentHandler
+
+aws_region = boto3.session.Session().region_name
+
+class ContentHandler(EmbeddingsContentHandler):
+    content_type = "application/json"
+    accepts = "application/json"
+
+    def transform_input(self, inputs: List[str], model_kwargs: Dict) -> bytes:
+        input_str = json.dumps({"text_inputs": inputs, **model_kwargs})
+        return input_str.encode('utf-8')
+
+    def transform_output(self, output: bytes) -> List[List[float]]:
+        response_json = json.loads(output.read().decode("utf-8"))
+        return response_json["embedding"]
+
+emb_content_handler = ContentHandler()
+
+embeddings = SagemakerEndpointEmbeddings(
+    endpoint_name='jumpstart-dft-hf-textembedding-gpt-j-6b-fp16',
+    region_name= aws_region,
+    content_handler=emb_content_handler,
+)
 
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -75,6 +100,10 @@ def parse_contents(contents, filename, date):
     #loader = PyPDFLoader(BytesIO(decoded))
     #chunks = loader.load_and_split()
     chunks = reader.pages
+    text = "Hi! It's time for the beach"
+    text_embedding = embeddings.embed_query(text)
+    print (f"Your embedding is length {len(text_embedding)}")
+    print (f"Here's a sample: {text_embedding[:5]}...")
     #print(f"Split document into {len(chunks)} chunks.")
     #save_to_chroma(chunks)
     #query_result = query_data("What is the deadline for the RfP?")
