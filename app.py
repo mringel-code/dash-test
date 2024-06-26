@@ -94,7 +94,7 @@ def parse_contents(contents, filename, date):
     for i in range(count):
         page = reader.pages[i]
         text += page.extract_text()
-     = summarize_data(text)
+    summary_result = summarize_data(text)
     
     text = "Hi! It's time for the beach"
     text_embedding = embeddings.embed_query(text)
