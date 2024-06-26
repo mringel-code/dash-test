@@ -96,7 +96,7 @@ def parse_contents(contents, filename, date):
         page = reader.pages[i]
         pagetext = page.extract_text()
         text += pagetext
-        chunks.append(pagetext)
+        chunks.append(str(pagetext))
     summary_result = summarize_data(text)
     
     text = "Hi! It's time for the beach"
@@ -184,7 +184,7 @@ def generate_summary(text):
     )
     return response['Body'].read().decode('utf-8')
 
-def save_to_chroma_text(chunks: List[string]):
+def save_to_chroma_text(chunks: List[str]):
     # Clear out the database first.
     if os.path.exists(CHROMA_PATH):
         shutil.rmtree(CHROMA_PATH)
