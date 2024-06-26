@@ -6,6 +6,6 @@ langchain_community
 langchain==0.1.0
 llama_index
 pypdf
-sagemaker --quiet --upgrade --force-reinstall
+sagemaker
 llama-index-embeddings-langchain
 llama-index-llms-langchain
