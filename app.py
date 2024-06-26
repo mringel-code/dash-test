@@ -94,15 +94,16 @@ def parse_contents(contents, filename, date):
     for i in range(count):
         page = reader.pages[i]
         text += page.extract_text()
-    summary_result = summarize_data(text)
+     = summarize_data(text)
+    
+    text = "Hi! It's time for the beach"
+    text_embedding = embeddings.embed_query(text)
+    summary_result = summary_result + text_embedding
     
     #loader = PyPDFLoader(BytesIO(decoded))
     #chunks = loader.load_and_split()
     chunks = reader.pages
-    text = "Hi! It's time for the beach"
-    text_embedding = embeddings.embed_query(text)
-    print (f"Your embedding is length {len(text_embedding)}")
-    print (f"Here's a sample: {text_embedding[:5]}...")
+    
     #print(f"Split document into {len(chunks)} chunks.")
     #save_to_chroma(chunks)
     #query_result = query_data("What is the deadline for the RfP?")
