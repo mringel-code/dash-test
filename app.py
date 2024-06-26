@@ -17,7 +17,7 @@ from io import BytesIO
 
 #RAG imports
 from langchain_community.vectorstores import Chroma
-#from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 #from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 
@@ -103,9 +103,9 @@ def parse_contents(contents, filename, date):
     text_embedding = embeddings.embed_query(text)
     summary_result = summary_result + str(text_embedding[:5])
     
-    #loader = PyPDFLoader(BytesIO(decoded))
-    #chunks = loader.load_and_split()
-    chunks = Document(reader.pages)
+    loader = PyPDFLoader(BytesIO(decoded))
+    chunks = loader.load_and_split()
+    #chunks = Document(reader.pages)
     save_to_chroma(chunks)
     #query_result = query_data("What is the deadline for the RfP?")
                 
