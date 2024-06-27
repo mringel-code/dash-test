@@ -4,5 +4,3 @@ boto3
 PyPDF2
 langchain
 llama_index
-llama-index-embeddings-langchain
-llama-index-llms-langchain
