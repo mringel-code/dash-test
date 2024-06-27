@@ -6,4 +6,4 @@ langchain
 langchain-community
 llama_index
 llama-index-embeddings-langchain
-llama-index-llms-langchain
+llama-index-llms-sagemaker-endpoint

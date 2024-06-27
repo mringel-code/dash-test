@@ -23,7 +23,8 @@ from io import BytesIO
 from llama_index.core import Document
 from llama_index.core import VectorStoreIndex, Settings
 from llama_index.embeddings.langchain import LangchainEmbedding
-from llama_index.llms.langchain import LangChainLLM
+#from llama_index.llms.langchain import LangChainLLM
+from llama_index.llms.sagemaker_endpoint import SageMakerLLM
 
 client = boto3.session.Session().client('sagemaker-runtime')
 
@@ -57,6 +58,11 @@ embeddings = SagemakerEndpointEmbeddings(
     endpoint_name='jumpstart-dft-hf-textembedding-gpt-j-6b-fp16',
     region_name= aws_region,
     content_handler=emb_content_handler,
+)
+
+llm = SageMakerLLM(
+    endpoint_name='jumpstart-dft-hf-textembedding-gpt-j-6b-fp16',
+    region_name= aws_region,
 )
 
 app = Dash(__name__, external_stylesheets=external_stylesheets)
@@ -107,7 +113,7 @@ def parse_contents(contents, filename, date):
     summary_result = summary_result + str(text_embedding[:5])
     
     Settings.embed_model = LangchainEmbedding(embeddings)
-    Settings.llm = LangChainLLM(llm)
+    #Settings.llm = LangChainLLM(llm)
     vector_index = VectorStoreIndex.from_documents(chunks)
     vector_index.as_query_engine()
     
