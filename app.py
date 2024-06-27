@@ -89,23 +89,22 @@ def parse_contents(contents, filename, date):
         #if 'pdf' in filename:  # Check if it is a pdf file
     file_path = os.path.abspath(filename)
     text = ""
-    #chunks = []
+    chunks = []
     reader = PdfReader(BytesIO(decoded))
     count = len(reader.pages)
     for i in range(count):
         page = reader.pages[i]
         pagetext = page.extract_text()
         text += pagetext
-        #chunks.append(str(pagetext))
+        chunks.append(str(pagetext))
     summary_result = summarize_data(text)
     
     text = "Hi! It's time for the beach"
     text_embedding = embeddings.embed_query(text)
     summary_result = summary_result + str(text_embedding[:5])
     
-    loader = PyPDFLoader(filename)
-    chunks = loader.load_and_split()
-    #chunks = Document(reader.pages)
+    #loader = PyPDFLoader(filename)
+    #chunks = loader.load_and_split()
     save_to_chroma(chunks)
     #query_result = query_data("What is the deadline for the RfP?")
                 
@@ -184,6 +183,26 @@ def generate_summary(text):
     )
     return response['Body'].read().decode('utf-8')
 
+def save_to_chroma(chunks: List[str]):
+    # Clear out the database first.
+    if os.path.exists(CHROMA_PATH):
+        shutil.rmtree(CHROMA_PATH)
+        
+     # Convert strings to Document objects
+    documents = [Document({"id": str(idx), "name": str(idx), "content": chunk}) for idx, chunk in enumerate(chunks)]
+
+    collection_metadata = {"hnsw:space": "cosine"} # Define the metadata to change the distance function to cosine
+    
+    # Create a new DB from the documents.
+    db = Chroma.from_texts(
+        documents, embeddings, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
+    )
+    db.persist()
+    
+if __name__ == '__main__':
+    app.run_server(host='0.0.0.0',port=8080)
+
+"""
 def save_to_chroma(chunks: List[Document]):
     # Clear out the database first.
     if os.path.exists(CHROMA_PATH):
@@ -196,12 +215,9 @@ def save_to_chroma(chunks: List[Document]):
         chunks, embeddings, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
     )
     db.persist()
-    #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
     
-if __name__ == '__main__':
-    app.run_server(host='0.0.0.0',port=8080)
 
-"""
+
 def save_to_chroma_text(chunks: List[str]):
     # Clear out the database first.
     if os.path.exists(CHROMA_PATH):

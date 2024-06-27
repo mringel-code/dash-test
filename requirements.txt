@@ -6,4 +6,3 @@ langchain_community
 langchain
 chromadb
 sqlalchemy
-pypdf
