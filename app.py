@@ -24,7 +24,7 @@ from llama_index.core import Document
 from llama_index.core import VectorStoreIndex, Settings
 from llama_index.embeddings.langchain import LangchainEmbedding
 #from llama_index.llms.langchain import LangChainLLM
-from llama_index.llms.sagemaker_endpoint import SageMakerLLM
+#from llama_index.llms.sagemaker_endpoint import SageMakerLLM
 
 client = boto3.session.Session().client('sagemaker-runtime')
 
@@ -60,10 +60,10 @@ embeddings = SagemakerEndpointEmbeddings(
     content_handler=emb_content_handler,
 )
 
-llm = SageMakerLLM(
-    endpoint_name='jumpstart-dft-hf-textembedding-gpt-j-6b-fp16',
-    region_name= aws_region,
-)
+#llm = SageMakerLLM(
+#    endpoint_name='jumpstart-dft-hf-textembedding-gpt-j-6b-fp16',
+#    region_name= aws_region,
+#)
 
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
