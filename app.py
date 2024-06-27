@@ -189,7 +189,7 @@ def save_to_chroma(chunks: List[str]):
         shutil.rmtree(CHROMA_PATH)
         
      # Convert strings to Document objects
-    documents = [Document({"id": str(idx), "name": str(idx), "content": chunk}) for idx, chunk in enumerate(chunks)]
+    documents = [Document({"id": str(idx), "name": str(idx), "content": chunk, "page_content": chunk}) for idx, chunk in enumerate(chunks)]
 
     collection_metadata = {"hnsw:space": "cosine"} # Define the metadata to change the distance function to cosine
     
