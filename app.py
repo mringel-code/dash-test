@@ -21,7 +21,9 @@ from io import BytesIO
 #from langchain.text_splitter import RecursiveCharacterTextSplitter
 #from langchain.schema import Document
 from llama_index.core import Document
-from llama_index.core import VectorStoreIndex
+from llama_index.core import VectorStoreIndex, Settings
+from llama_index.embeddings.langchain import LangchainEmbedding
+from llama_index.llms.langchain import LangChainLLM
 
 client = boto3.session.Session().client('sagemaker-runtime')
 
@@ -104,6 +106,8 @@ def parse_contents(contents, filename, date):
     text_embedding = embeddings.embed_query(text)
     summary_result = summary_result + str(text_embedding[:5])
     
+    Settings.embed_model = LangchainEmbedding(embeddings)
+    Settings.llm = LangChainLLM(llm)
     vector_index = VectorStoreIndex.from_documents(chunks)
     vector_index.as_query_engine()
     
