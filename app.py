@@ -16,10 +16,12 @@ from PyPDF2 import PdfReader
 from io import BytesIO
 
 #RAG imports
-from langchain_community.vectorstores import Chroma
-from langchain_community.document_loaders import PyPDFLoader
+#from langchain_community.vectorstores import Chroma
+#from langchain_community.document_loaders import PyPDFLoader
 #from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.schema import Document
+#from langchain.schema import Document
+from llama_index.core import Document
+from llama_index.core import VectorStoreIndex
 
 client = boto3.session.Session().client('sagemaker-runtime')
 
@@ -96,16 +98,20 @@ def parse_contents(contents, filename, date):
         page = reader.pages[i]
         pagetext = page.extract_text()
         text += pagetext
-        chunks.append(str(pagetext))
+        chunks.append(Document(text=pagetext))
     summary_result = summarize_data(text)
     
     text = "Hi! It's time for the beach"
     text_embedding = embeddings.embed_query(text)
     summary_result = summary_result + str(text_embedding[:5])
     
-    #loader = PyPDFLoader(filename)
+    
+    vector_index = VectorStoreIndex.from_documents(chunks)
+    vector_index.as_query_engine()
+    
+    #loader = PyPDFLoader(decoded)
     #chunks = loader.load_and_split()
-    save_to_chroma(chunks)
+    #save_to_chroma(chunks)
     #query_result = query_data("What is the deadline for the RfP?")
                 
     #except Exception as e:

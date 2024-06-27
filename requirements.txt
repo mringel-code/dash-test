@@ -2,7 +2,7 @@ dash
 pandas
 boto3
 PyPDF2
-langchain_community
 langchain
-chromadb
-sqlalchemy
+llama_index
+llama-index-embeddings-langchain
+llama-index-llms-langchain
