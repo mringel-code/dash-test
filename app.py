@@ -189,13 +189,13 @@ def save_to_chroma(chunks: List[str]):
         shutil.rmtree(CHROMA_PATH)
         
      # Convert strings to Document objects
-    documents = [Document({"id": str(idx), "name": str(idx), "content": str(chunk), "page_content": str(chunk)}) for idx, chunk in enumerate(chunks)]
+    #documents = [Document({"id": str(idx), "name": str(idx), "content": str(chunk), "page_content": str(chunk)}) for idx, chunk in enumerate(chunks)]
 
     collection_metadata = {"hnsw:space": "cosine"} # Define the metadata to change the distance function to cosine
     
     # Create a new DB from the documents.
     db = Chroma.from_texts(
-        documents, embeddings, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
+        chunks, embeddings, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
     )
     db.persist()
     
