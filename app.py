@@ -30,9 +30,8 @@ content_type = 'application/json'  # The MIME type of the input data in the requ
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-CHROMA_PATH = "chroma"
+#CHROMA_PATH = "chroma"
 
-import langchain
 from langchain.embeddings import SagemakerEndpointEmbeddings
 from langchain.embeddings.sagemaker_endpoint import EmbeddingsContentHandler
 
