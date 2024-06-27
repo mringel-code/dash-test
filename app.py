@@ -23,22 +23,16 @@ from io import BytesIO
 from llama_index.core import Document
 from llama_index.core import VectorStoreIndex, Settings
 from llama_index.embeddings.langchain import LangchainEmbedding
-#from llama_index.llms.langchain import LangChainLLM
+from llama_index.llms.langchain import LangChainLLM
 #from llama_index.llms.sagemaker_endpoint import SageMakerLLM
 
 client = boto3.session.Session().client('sagemaker-runtime')
-
-endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
-content_type = 'application/json'  # The MIME type of the input data in the request body.
-
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
+aws_region = boto3.session.Session().region_name
 #CHROMA_PATH = "chroma"
 
+#Get Embedding Model
 from langchain.embeddings import SagemakerEndpointEmbeddings
 from langchain.embeddings.sagemaker_endpoint import EmbeddingsContentHandler
-
-aws_region = boto3.session.Session().region_name
 
 class ContentHandler(EmbeddingsContentHandler):
     content_type = "application/json"
@@ -60,10 +54,52 @@ embeddings = SagemakerEndpointEmbeddings(
     content_handler=emb_content_handler,
 )
 
-#llm = SageMakerLLM(
-#    endpoint_name='jumpstart-dft-hf-textembedding-gpt-j-6b-fp16',
-#    region_name= aws_region,
-#)
+#Get LLM
+endpoint_name = 'jumpstart-dft-meta-textgeneration-llama-3-8b-instruct' # Your endpoint name.
+content_type = 'application/json'  # The MIME type of the input data in the request body.
+
+from langchain.llms import SagemakerEndpoint
+from langchain.llms.sagemaker_endpoint import LLMContentHandler
+
+class ContentHandler(LLMContentHandler):
+    content_type = "application/json"
+    accepts = "application/json"
+
+
+    def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
+            payload = {
+                "inputs": [
+                    [
+                        {
+                            "role": "system",
+                            "content": system_prompt,
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                ],
+                "parameters": model_kwargs,
+            }
+            input_str = json.dumps(
+                payload,
+            )
+            return input_str.encode("utf-8")
+   
+    def transform_output(self, output: bytes) -> str:
+            response_json = json.loads(output.read().decode("utf-8"))
+            content = response_json[0]["generation"]["content"]
+            return content
+        
+content_handler = ContentHandler()
+
+llm = SagemakerEndpoint(
+        endpoint_name = endpoint_name,
+        region_name = aws_region,
+        model_kwargs = {"max_new_tokens":500, "top_p": 0.1, "temperature": 0.4, "return_full_text": False},
+        content_handler = content_handler,
+        endpoint_kwargs = {"CustomAttributes": "accept_eula=true"}
+    )
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
