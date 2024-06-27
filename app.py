@@ -104,7 +104,6 @@ def parse_contents(contents, filename, date):
     text_embedding = embeddings.embed_query(text)
     summary_result = summary_result + str(text_embedding[:5])
     
-    
     vector_index = VectorStoreIndex.from_documents(chunks)
     vector_index.as_query_engine()
     
@@ -187,22 +186,6 @@ def generate_summary(text):
         Body=payload
     )
     return response['Body'].read().decode('utf-8')
-
-def save_to_chroma(chunks: List[str]):
-    # Clear out the database first.
-    if os.path.exists(CHROMA_PATH):
-        shutil.rmtree(CHROMA_PATH)
-        
-     # Convert strings to Document objects
-    #documents = [Document({"id": str(idx), "name": str(idx), "content": str(chunk), "page_content": str(chunk)}) for idx, chunk in enumerate(chunks)]
-
-    collection_metadata = {"hnsw:space": "cosine"} # Define the metadata to change the distance function to cosine
-    
-    # Create a new DB from the documents.
-    db = Chroma.from_texts(
-        chunks, embeddings, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
-    )
-    db.persist()
     
 if __name__ == '__main__':
     app.run_server(host='0.0.0.0',port=8080)

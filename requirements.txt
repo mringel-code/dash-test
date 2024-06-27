@@ -3,4 +3,5 @@ pandas
 boto3
 PyPDF2
 langchain
+langchain-community
 llama_index
