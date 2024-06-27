@@ -103,7 +103,7 @@ def parse_contents(contents, filename, date):
     text_embedding = embeddings.embed_query(text)
     summary_result = summary_result + str(text_embedding[:5])
     
-    loader = PyPDFLoader(file_path)
+    loader = PyPDFLoader(filename)
     chunks = loader.load_and_split()
     #chunks = Document(reader.pages)
     save_to_chroma(chunks)
@@ -184,6 +184,23 @@ def generate_summary(text):
     )
     return response['Body'].read().decode('utf-8')
 
+def save_to_chroma(chunks: List[Document]):
+    # Clear out the database first.
+    if os.path.exists(CHROMA_PATH):
+        shutil.rmtree(CHROMA_PATH)
+
+    collection_metadata = {"hnsw:space": "cosine"} # Define the metadata to change the distance function to cosine
+    
+    # Create a new DB from the documents.
+    db = Chroma.from_documents(
+        chunks, embeddings, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
+    )
+    db.persist()
+    #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
+    
+if __name__ == '__main__':
+    app.run_server(host='0.0.0.0',port=8080)
+
 """
 def save_to_chroma_text(chunks: List[str]):
     # Clear out the database first.
@@ -198,21 +215,7 @@ def save_to_chroma_text(chunks: List[str]):
     )
     db.persist()
     #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
-"""
-def save_to_chroma(chunks: List[Document]):
-    # Clear out the database first.
-    if os.path.exists(CHROMA_PATH):
-        shutil.rmtree(CHROMA_PATH)
 
-    collection_metadata = {"hnsw:space": "cosine"} # Define the metadata to change the distance function to cosine
-    
-    # Create a new DB from the documents.
-    db = Chroma.from_documents(
-        chunks, embeddings, persist_directory=CHROMA_PATH, collection_metadata=collection_metadata
-    )
-    db.persist()
-    #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
-"""
 def query_data(query_text):
     # Prepare the DB.
     embedding_function = lc_embed_model
@@ -256,6 +259,3 @@ def generate_response(context, text):
     )
     return response['Body'].read().decode('utf-8')
 """
-
-if __name__ == '__main__':
-    app.run_server(host='0.0.0.0',port=8080)
